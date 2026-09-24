@@ -1,0 +1,165 @@
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { ArrowRight, Phone, User } from "lucide-react";
+import BrandLogo from "../components/BrandLogo";
+import GoldButton from "../components/GoldButton";
+import LuxePanel from "../components/LuxePanel";
+import ScreenTransition from "../components/ScreenTransition";
+import TextField from "../components/TextField";
+import { layout, rise, spring, stagger } from "../lib/motion";
+import type { Account, Role } from "../types";
+
+interface RegistrationScreenProps {
+  onContinue: (account: Account, role: Role) => void;
+}
+
+const roles: { id: Role; label: string }[] = [
+  { id: "customer", label: "Customer" },
+  { id: "subscriber", label: "Subscriber" },
+  { id: "admin", label: "Super Admin" },
+];
+
+export default function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<Role>("customer");
+  const [submitted, setSubmitted] = useState(false);
+
+  const nameError = name.trim().length < 2 ? "Enter your full name as on your records." : undefined;
+  const digits = phone.replace(/\D/g, "");
+  const phoneError = digits.length !== 10 ? "A 10-digit Indian mobile number is required." : undefined;
+  const valid = !nameError && !phoneError;
+
+  const submit = () => {
+    setSubmitted(true);
+    if (!valid) return;
+    onContinue({ name: name.trim(), phone: digits }, role);
+  };
+
+  return (
+    <ScreenTransition className="overflow-hidden px-7 pb-[clamp(14px,2.4vh,36px)] lg:overflow-y-auto lg:px-16">
+      <motion.div
+        variants={stagger}
+        initial="initial"
+        animate="animate"
+        className="mx-auto flex h-full w-full flex-col justify-center gap-[clamp(10px,2vh,22px)] pt-[max(1rem,env(safe-area-inset-top))] lg:justify-start lg:gap-0 lg:pt-0 lg:grid lg:max-w-[1240px] lg:grid-cols-[1.1fr_minmax(400px,460px)] lg:items-center lg:gap-24 lg:py-16 lg:pt-0"
+      >
+        {/* Editorial column */}
+        <div className="flex flex-col lg:h-full lg:justify-center lg:pt-0">
+          <motion.div variants={rise} className="relative flex justify-center lg:justify-start">
+            {/* Halo breathing behind the mark */}
+            <motion.span
+              aria-hidden
+              className="pointer-events-none absolute -inset-10 -z-10"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 50%, rgba(249,223,50,0.16) 0%, rgba(249,223,50,0) 68%)",
+                filter: "blur(18px)",
+              }}
+              animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.05, 0.96] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <BrandLogo variant="lockup" width={190} sizeClass="w-[clamp(124px,36vw,190px)] lg:w-[250px]" shared />
+          </motion.div>
+
+          <motion.div variants={rise} className="mt-[clamp(6px,1.6vh,44px)] lg:mt-14">
+            <p className="text-[10px] tracking-luxe uppercase text-bronze">Est. Kochi</p>
+            <h1 className="mt-2 font-display text-[clamp(26px,7.4vw,40px)] leading-[1.05] text-champagne lg:text-[64px]">
+              A private gold
+              <br />
+              <span className="text-metal-shimmer">portfolio</span>, opened.
+            </h1>
+            <p className="mt-2.5 hidden max-w-[30ch] text-[12.5px] leading-relaxed text-champagne-dim min-[380px]:block lg:mt-6 lg:max-w-[42ch] lg:text-[15px]">
+              Begin with your name and number. Everything after takes under a minute.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Form column */}
+        <motion.div variants={rise} className="lg:mt-0">
+          <LuxePanel>
+          <p className="text-[10.5px] tracking-luxe uppercase text-gold-200/85">Open your account</p>
+
+          <div className="mt-[clamp(10px,1.8vh,16px)] flex gap-2" role="group" aria-label="Sign in as">
+            {roles.map((option) => {
+              const isActive = role === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setRole(option.id)}
+                  aria-pressed={isActive}
+                  className="relative isolate flex-1 rounded-full px-2 py-2 text-[9px] tracking-[0.12em] uppercase transition-colors duration-300 lg:px-3 lg:text-[10.5px] lg:tracking-luxe-sm"
+                  style={{
+                    border: `1px solid ${isActive ? "rgba(249,223,50,0.42)" : "rgba(215,175,92,0.2)"}`,
+                    color: isActive ? "#120000" : "#9c8a6d",
+                  }}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="role-chip"
+                      aria-hidden
+                      className="metal-gold absolute inset-0 -z-10 rounded-full"
+                      transition={spring.soft}
+                    />
+                  )}
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit();
+            }}
+            className="mt-[clamp(12px,2.2vh,24px)] flex flex-col gap-[clamp(10px,1.8vh,16px)]"
+          >
+            <TextField
+              label="Full name"
+              value={name}
+              onChange={setName}
+              autoComplete="name"
+              icon={<User size={15} strokeWidth={1.5} />}
+              glossDelay={0}
+              error={submitted ? nameError : undefined}
+            />
+            <TextField
+              label="Mobile number"
+              value={phone}
+              onChange={(next) => setPhone(next.replace(/[^\d\s+]/g, ""))}
+              inputMode="tel"
+              autoComplete="tel"
+              maxLength={15}
+              icon={<Phone size={15} strokeWidth={1.5} />}
+              glossDelay={0.22}
+              error={submitted ? phoneError : undefined}
+              hint={!submitted ? "We send a one-time code to this number." : undefined}
+            />
+            <button type="submit" className="sr-only">
+              Continue
+            </button>
+          </form>
+
+          <div className="pt-[clamp(14px,2.4vh,28px)]">
+            <GoldButton
+              onClick={submit}
+              layoutId={layout.primaryAction}
+              icon={<ArrowRight size={15} strokeWidth={1.8} />}
+            >
+              Continue
+            </GoldButton>
+
+            <p className="mt-[clamp(10px,1.8vh,20px)] text-center text-[10px] leading-relaxed text-champagne-soft/70">
+              By continuing you accept our terms and privacy notice.
+              <br />
+              This is a demonstration — no data leaves your device.
+            </p>
+          </div>
+          </LuxePanel>
+        </motion.div>
+      </motion.div>
+    </ScreenTransition>
+  );
+}

@@ -1,0 +1,334 @@
+@import "tailwindcss";
+
+@theme {
+  /* A bold, upright serif for headlines and prices — reads as premium at
+     weight 600/700 without the thin italic strokes that hurt legibility.
+     Body copy stays on Inter, chosen purely for how clean it is at small sizes. */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-wine-950: #120000;
+  --color-wine-900: #1a0000;
+  --color-wine-850: #230101;
+  --color-wine-800: #2e0202;
+  --color-maroon-700: #540000;
+  --color-maroon-600: #6a1212;
+  --color-maroon-500: #7d2020;
+
+  --color-gold-700: #6e4a0c;
+  --color-gold-600: #91640f;
+  --color-gold-500: #b3871c;
+  --color-gold-400: #d8ac33;
+  --color-gold-300: #f9df32;
+  --color-gold-200: #f7e79a;
+  --color-gold-100: #fbf1c9;
+
+  /* Pushed close to white — body copy and hints read clearly against the
+     dark ribboned background instead of sinking into it. */
+  --color-bronze: #d3ba91;
+  --color-champagne: #faf5e9;
+  --color-champagne-soft: #f4ecd9;
+  --color-champagne-dim: #eee4cf;
+  --color-ivory: #fefdf9;
+
+  --radius-card: 1.75rem;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background-color: var(--color-wine-950);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-wine-950);
+    color: var(--color-champagne);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    letter-spacing: 0.012em;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  input {
+    background: transparent;
+    font-family: inherit;
+  }
+
+  /*
+    Chrome paints its own pale plate behind autofilled values, which breaks
+    straight through the glass fields. `background-clip: text` keeps that plate
+    confined to the glyphs, and the long transition stops it flashing back.
+  */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-champagne);
+    -webkit-background-clip: text;
+    background-clip: text;
+    caret-color: var(--color-gold-300);
+    transition: background-color 100000s ease-in-out 0s;
+  }
+
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 1px solid rgba(249, 223, 50, 0.75);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /*
+    Fields carry their own focus treatment (gold border plus glow), so the
+    generic ring would draw a second box inside the first.
+  */
+  input:focus-visible {
+    outline: none;
+  }
+
+  ::selection {
+    background: rgba(249, 223, 50, 0.28);
+    color: var(--color-ivory);
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+/* Metallic gold, used for fills */
+@utility metal-gold {
+  background-image: linear-gradient(
+    135deg,
+    #6e4a0c 0%,
+    #91640f 16%,
+    #d8ac33 38%,
+    #f9df32 50%,
+    #fdf6cf 56%,
+    #f9df32 62%,
+    #b3871c 80%,
+    #7b5310 100%
+  );
+}
+
+@utility metal-gold-soft {
+  background-image: linear-gradient(135deg, #91640f 0%, #f9df32 52%, #b3871c 100%);
+}
+
+@utility text-metal-gold {
+  background-image: linear-gradient(105deg, #b3871c 0%, #f9df32 38%, #fdf6cf 50%, #e2bb44 62%, #91640f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Frosted maroon glass with metallic hairline and inner reflection */
+@utility glass {
+  /* The same colours the translucent plate used to composite to, but opaque:
+     the drifting backdrop can no longer show through one card and make it
+     look like it is moving, and nothing blends per frame behind it. */
+  background-image: linear-gradient(
+    152deg,
+    rgb(85, 18, 18) 0%,
+    rgb(42, 5, 5) 46%,
+    rgb(20, 1, 1) 100%
+  );
+  border: 1px solid rgba(215, 175, 92, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(251, 241, 201, 0.14),
+    inset 0 -24px 44px -30px rgba(0, 0, 0, 0.9),
+    0 24px 60px -32px rgba(0, 0, 0, 0.95);
+}
+
+/*
+  Frosting costs a backdrop re-filter on every frame the surface or what sits
+  behind it moves, so it is reserved for the fixed overlays that content
+  actually passes behind — never for anything inside a scroller.
+*/
+@utility glass-blur {
+  -webkit-backdrop-filter: blur(14px) saturate(118%);
+  backdrop-filter: blur(14px) saturate(118%);
+}
+
+@utility glass-raised {
+  box-shadow:
+    inset 0 1px 0 rgba(251, 241, 201, 0.2),
+    inset 0 -24px 44px -30px rgba(0, 0, 0, 0.9),
+    0 30px 70px -30px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(249, 223, 50, 0.14),
+    0 0 34px -14px rgba(249, 223, 50, 0.24);
+}
+
+@utility hairline-gold {
+  border: 1px solid rgba(215, 175, 92, 0.2);
+}
+
+@utility grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");
+  background-size: 160px 160px;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+  The atmosphere loops run as CSS animations rather than scripted ones: same
+  motion, but the compositor owns every frame instead of the main thread.
+*/
+@keyframes bg-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  50% {
+    transform: translate3d(-14px, 10px, 0) scale(1.08);
+  }
+}
+
+@utility bg-drift {
+  animation: bg-drift 48s ease-in-out infinite;
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--drift-x), var(--drift-y), 0);
+  }
+}
+
+@utility orb-drift {
+  animation: orb-drift var(--drift-duration) ease-in-out var(--drift-delay) infinite;
+}
+
+@keyframes particle-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate3d(0, calc(var(--rise) * -1), 0);
+    opacity: var(--peak);
+  }
+}
+
+@utility particle-float {
+  animation: particle-float var(--drift-duration) ease-in-out var(--drift-delay) infinite;
+}
+
+/* Gloss travelling across a glass surface, then resting. */
+@keyframes gloss-sweep {
+  0% {
+    transform: translateX(-180%) skewX(-16deg);
+  }
+  38%,
+  100% {
+    transform: translateX(320%) skewX(-16deg);
+  }
+}
+
+@utility gloss-sweep {
+  animation: gloss-sweep 6.8s ease-in-out infinite;
+}
+
+/* Light running along an edge or rail. */
+@keyframes rail-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  42%,
+  100% {
+    transform: translateX(420%);
+  }
+}
+
+@utility rail-sweep {
+  animation: rail-sweep 8s ease-in-out infinite;
+}
+
+/* Border beam orbiting a panel. */
+@keyframes beam-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@utility beam-spin {
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: beam-spin 11s linear infinite;
+}
+
+/* Gold sweeping through display text, on a loop. */
+@keyframes shimmer-sweep {
+  0% {
+    background-position: 180% 50%;
+  }
+  60%,
+  100% {
+    background-position: -60% 50%;
+  }
+}
+
+@utility text-metal-shimmer {
+  background-image: linear-gradient(
+    105deg,
+    #b3871c 0%,
+    #f9df32 30%,
+    #fffbe8 44%,
+    #f9df32 56%,
+    #91640f 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 9s ease-in-out infinite;
+}
+
+@utility tracking-luxe {
+  letter-spacing: 0.28em;
+}
+
+@utility tracking-luxe-sm {
+  letter-spacing: 0.18em;
+}
+
+/*
+  A scroller in flight stops hit-testing its contents, so cards sliding past
+  the cursor cannot fire hover shadows and lift springs while the compositor is
+  busy. The attribute is dropped 140ms after the last scroll event.
+*/
+[data-scrolling] > * {
+  pointer-events: none;
+}
+
+/*
+  The shimmer sweeps a gradient through clipped text, which is the one loop in
+  the app the compositor cannot own: it repaints the glyphs every frame, inside
+  the scroller, on the main thread. It holds its position for the length of a
+  flick and resumes where it left off.
+*/
+[data-scrolling] .text-metal-shimmer {
+  animation-play-state: paused;
+}
