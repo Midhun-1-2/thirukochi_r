@@ -15,6 +15,11 @@ services:
         name: Cache-Control
         value: public, max-age=31536000, immutable
     routes:
+      # `/*` does not match the bare root on Render, so the root gets its own
+      # rule; without it the site 404s at / while every deeper path works.
+      - type: rewrite
+        source: /
+        destination: /index.html
       - type: rewrite
         source: /*
         destination: /index.html
